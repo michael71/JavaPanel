@@ -1,0 +1,20 @@
+# NetBeans specific #
+nbproject/private/
+build/
+nbbuild/
+nbdist/
+nbactions.xml
+nb-configuration.xml
+
+# Class Files #
+*.class
+
+# Package Files #
+*.war
+*.ear
+
+# lanbahn additional config files
+*.xml.2016????_??????
+
+# temp files
+*~
