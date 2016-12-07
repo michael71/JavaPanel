@@ -10,3 +10,5 @@ siehe auch <a href="https://opensx.net" target="_blank">opensx.net</a>
 (c) Michael Blank, IBM Klub BB Sparte Modellbahn - 2015-2016
 
 Licence: GPL v3.0
+
+<img src="https://github.com/michael71/JavaPanel/blob/master/JavaPanel.png" target="_blank">JavaPanel Screenshot</a>
