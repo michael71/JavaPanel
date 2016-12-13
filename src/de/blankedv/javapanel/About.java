@@ -10,9 +10,9 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import static de.blankedv.javapanel.Defines.version;
 import java.net.URL;
 import javax.swing.ImageIcon;
+import static de.blankedv.javapanel.Defines.VERSION;
 /**
  *
  * @author mblank
@@ -24,7 +24,7 @@ public class About extends javax.swing.JFrame {
      */
     public About() {
         initComponents();
-        lblVersion.setText(version);
+        lblVersion.setText(VERSION);
         URL iconURL = getClass().getResource("javapanel-icon.png");
         ImageIcon icon = new ImageIcon(iconURL);
         lblIcon.setIcon(icon);

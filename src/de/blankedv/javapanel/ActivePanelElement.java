@@ -179,8 +179,8 @@ public abstract class ActivePanelElement extends PanelElement {
 	}  */
     
     protected void doDrawAddresses(Graphics2D g) {
-        g.setFont(addressFont);
-        g.setColor(addressColor);
+        g.setFont(ADDRESS_FONT);
+        g.setColor(ADDRESS_COLOR);
         //Rectangle bounds = getRect();
         String txt;
         if (adr == INVALID_INT) {

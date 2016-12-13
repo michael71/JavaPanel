@@ -32,7 +32,7 @@ public class TurnoutElement extends ActivePanelElement {
     public void doDraw(Graphics2D g) {
 
          // draw a line and not a bitmap
-        g.setStroke(strokeSolid);
+        g.setStroke(STROKE_SOLID);
  /*       if (enableEdit) {
             g.setColor(Color.GREEN);
             g.drawLine((int) (x * scale), (int) (y * scale), (int) (x2 * scale), (int) (y2 * scale));

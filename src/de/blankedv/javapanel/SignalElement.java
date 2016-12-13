@@ -48,14 +48,14 @@ public class SignalElement extends ActivePanelElement {
         // read data from SX bus and paint position of turnout accordingly
         // draw a line and not a bitmap
         g.setColor(cSignal);
-        g.setStroke(strokeLite);
+        g.setStroke(STROKE_LITE);
         g.drawLine(x, y, x2, y2); //(int) (x * scale), (int) (y * scale), (int) (x2 * scale), (int) (y2 * scale));
 
         g.drawLine(x2, (y2 - 2), x2, (y2 + 2));
 
         g.setColor(cSignal);
 
-        g.setStroke(strokeSolid);
+        g.setStroke(STROKE_SOLID);
         // TODO finetune position of color indicator
         int r = 8;
         int r2 = 6;

@@ -325,7 +325,7 @@ public class Route {
     public static void auto() {
         // check for auto reset of routes
         for (Route rt : routes) {
-            if (((System.currentTimeMillis() - rt.timeSet) > 30 * 1000L)
+            if (((System.currentTimeMillis() - rt.timeSet) > autoClearTimeRoutes * 1000L)
                     && (rt.active)) {
                 rt.clear();
             }

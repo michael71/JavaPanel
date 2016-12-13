@@ -60,7 +60,7 @@ public class PanelElement {
     }
 
     public void doDraw(Graphics2D g) {
-        g.setStroke(strokeSolid);
+        g.setStroke(STROKE_SOLID);
         g.setColor(cTrack);
         g.drawLine(x, y, x2, y2 );
     }

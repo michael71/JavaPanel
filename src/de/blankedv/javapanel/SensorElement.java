@@ -33,7 +33,7 @@ public class SensorElement extends ActivePanelElement {
 
     @Override
     public void doDraw(Graphics2D g) {
-        g.setStroke(strokeDash);
+        g.setStroke(STROKE_DASH);
         // TODO make sensor appearance dependend on US or EU style
         if (x2 != INVALID_INT) {  // draw dashed line as sensor
             // set color according to state

@@ -57,11 +57,16 @@ public class JavaPanel extends JPanel implements ActionListener,
 
     public JavaPanel() {
 
-        System.out.println("JavaPanel, version = " + version);
+        System.out.println("JavaPanel, version = " + VERSION);
         prefs = Preferences.userNodeForPackage(this.getClass());
         loadPrefs();
 
-        //Create the menu bar.
+        initMenues();
+ 
+    }
+
+    private void initMenues() {
+               //Create the menu bar.
         menuBar = new JMenuBar();
 
         //Build the first menu.
@@ -79,27 +84,7 @@ public class JavaPanel extends JPanel implements ActionListener,
         menu2 = new JMenu("Info");
         menuBar.add(menu2);
 
-        addMouseListener(new MouseAdapter() {
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-
-                // e.getX/Y() is scaled
-                int x = (int) (e.getX() / scale);
-                int y = (int) (e.getY() / scale);
-                if (DEBUG) {
-                    System.out.println("touch x,y=(" + x + "," + y + ")");
-                }
-
-                for (PanelElement pe : panelElements) {
-                    if (pe.isSelected(x, y)) {
-                        // System.out.println("selected:"+pe.toString());
-                        pe.toggle();
-                    }
-                }
-            }
-
-        });
+       
 
         /* not needed, no keyboard input
                addKeyListener(new KeyListener() {
@@ -139,7 +124,7 @@ public class JavaPanel extends JPanel implements ActionListener,
             }
         });
     }
-
+    
     @Override
     public void paint(Graphics g) {
         super.paint(g);
@@ -254,15 +239,39 @@ public class JavaPanel extends JPanel implements ActionListener,
             System.out.println(TAG + " ERROR: could not init LanbahnInterface " + ex.getMessage());
         }
 
+        railwaypanel.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+
+                // e.getX/Y() is scaled
+                int x = (int) (e.getX() / scale);
+                int y = (int) (e.getY() / scale);
+                if (DEBUG) {
+                    System.out.println("touch x,y=(" + x + "," + y + ")");
+                }
+
+                for (PanelElement pe : panelElements) {
+                    if (pe.isSelected(x, y)) {
+                        // System.out.println("selected:"+pe.toString());
+                        pe.toggle();
+                    }
+                }
+            }
+
+        });
+         
         while (true) {
             if (recalcScaleFlag) {
                 getPanelScale();
                 recalcScaleFlag = false;
             }
             railwaypanel.repaint();
-            Route.auto();  // clear routes after 30 secs
+            Route.auto();  // clear routes after some seconds
             Thread.sleep(200);  // allow some time for other processes/programs
         }
+        
+       
     }
 
     private static void getPanelScale() {
@@ -312,6 +321,9 @@ public class JavaPanel extends JPanel implements ActionListener,
         drawAddresses = prefs.getBoolean("showAddresses", false);
         drawAddresses2 = prefs.getBoolean("showAddresses", false);
         routesEnabled = prefs.getBoolean("routesEnabled", false);
+        String ac = prefs.get("autocleartime","30s");
+        autoClearTimeRoutes = Integer.parseInt(ac.substring(0,ac.length()-1));
+        
         String scaleString = prefs.get("scale", "2.0");
         if (scaleString.equalsIgnoreCase("auto")) {
             scale = 2.0f;
@@ -343,14 +355,17 @@ public class JavaPanel extends JPanel implements ActionListener,
         if (DEBUG) {
             System.out.println("autoscalePanel, w=" + wi + " h=" + he);
         }
-        int minx = 0;  // fixed !!!
+        int minx = 1000;  
         int maxx = 0;
-        int miny = 0;  // fixed !!!
+        int miny = 1000;   
         int maxy = 0;
 
         for (PanelElement pe : panelElements) {
             int peMaxx = Utils.max(pe.x, pe.xt, pe.x2);
             int peMaxy = Utils.max(pe.y, pe.yt, pe.y2);
+            
+            int peMinx = Utils.min(pe.x, pe.xt, pe.x2);
+            int peMiny = Utils.min(pe.y, pe.yt, pe.y2);
 
             if (peMaxx > maxx) {
                 maxx = peMaxx;
@@ -358,12 +373,20 @@ public class JavaPanel extends JPanel implements ActionListener,
             if (peMaxy > maxy) {
                 maxy = peMaxy;
             }
+            
+            if (peMinx < minx) {
+                minx = peMinx;
+            }
+            if (peMiny < miny) {
+                miny = peMiny;
+            }
         }
         if (DEBUG) {
-            System.out.println("maxx=" + maxx + " maxy=" + maxy);
+            System.out.println("minx=" + minx + " maxx=" + maxx + 
+                    " miny=" + miny + " maxy=" + maxy);
         }
-        float px = (float) wi / (float) (maxx + 20);
-        float py = (float) he / (float) (maxy + 20);
+        float px = (float) wi / (float) (maxx - minx + 40);
+        float py = (float) he / (float) (maxy - miny + 40);
         if (DEBUG) {
             System.out.println("px=" + px + " py=" + py);
         }

@@ -122,7 +122,7 @@ public class LanbahnInterface extends TimerTask {
                     multicastsocket.receive(packet);
                     String message = new String(packet.getData(), 0,
                             packet.getLength(), TEXT_ENCODING);
-                    message = message.replaceAll("\\s+", " ").trim();
+                    message = message.replaceAll("\\s+", " ").trim().toUpperCase();
                     // replace multiple spaces by one only
                     if (DEBUG_COMM) {
                         System.out.println("rec:  " + message + " ");
@@ -143,8 +143,9 @@ public class LanbahnInterface extends TimerTask {
         /**
          * interpret a lanbahn command
          *
-         * "S 802 1" means set channel 802 to value 1 only listens to "S" (set)
-         * and "R" (read) commands
+         * "S 802 1" means set channel 802 to value 1 
+         * 
+         * only listens to "S" (set), "R" (read), "fb" (feedback) commands
          *
          * @param msg
          * @return
@@ -156,8 +157,7 @@ public class LanbahnInterface extends TimerTask {
             String[] command = msg.split(" ");
 
             if ((command.length == 3)
-                    && (command[0].trim().substring(0, 1)
-                    .equalsIgnoreCase("s"))) {
+                    && (command[0].startsWith("S"))) {
                 // this is a SET commmand
 
                 // check for addresses (2nd argument)
@@ -180,9 +180,7 @@ public class LanbahnInterface extends TimerTask {
                     }
                 }
 
-            } else if ((command.length == 3)
-                    && (command[0].trim().substring(0, 2)
-                    .equalsIgnoreCase("fb"))) {
+            } else if ((command.length == 3) && (command[0].startsWith("FB"))) {
                 // this is a Feedback command
 
                 // check for addresses (2nd argument)
@@ -197,9 +195,8 @@ public class LanbahnInterface extends TimerTask {
                         pe.setState(data);
                     }
                 }
-
             } else if ((command.length == 2)
-                    && (command[0].trim().equalsIgnoreCase("r"))) {
+                    && (command[0].startsWith("R"))) {
                 // then this is a READ command
 
                 // check for addresses (2nd argument)

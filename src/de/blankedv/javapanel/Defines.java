@@ -9,7 +9,6 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.util.ArrayList;
-import java.util.ResourceBundle;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.prefs.Preferences;
@@ -37,7 +36,8 @@ public class Defines {
     public static ArrayList<PanelElement> panelElements = new ArrayList<>();
     public static ArrayList<Route> routes = new ArrayList<>();
     public static ArrayList<CompRoute> compRoutes = new ArrayList<>();
-
+    public static ArrayList<SXMapping> sxmap = new ArrayList<>();
+    
     public static final int MAX_LAMP_BUTTONS = 4;
 
     public static String panelName = "";
@@ -51,6 +51,8 @@ public class Defines {
     public static boolean sendStartOfDay = false;
     public static boolean simulation = false;
     public static boolean routesEnabled = false;
+    public static int autoClearTimeRoutes = 30;    // clear routes automatically after 30secs
+
 
     // preferences
     // public static final String KEY_LOCO_ADR = "locoAdrPref";
@@ -99,16 +101,16 @@ public class Defines {
 
     public static int RASTER = 20; // raster points
     // with xx pixels
-    public static final int TURNOUT_LENGTH = 10; // NOT to be prescaled
+    public static final int TURNOUT_LENGTH = 8; // NOT to be prescaled
     public static final int TURNOUT_LENGTH_LONG = (int) (TURNOUT_LENGTH * 1.4f);
 
 
     public static boolean enableEdit = false;
 
-    public static final BasicStroke strokeSolid = new BasicStroke(6.0f , BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL);
-    public static final BasicStroke strokeLite = new BasicStroke(3.0f , BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL);
-    public static final float dash[] = {8.0f};
-    public static final BasicStroke strokeDash = new BasicStroke(4.0f , BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, dash, 0.0f);
+    public static final BasicStroke STROKE_SOLID = new BasicStroke(5.0f , BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL);
+    public static final BasicStroke STROKE_LITE = new BasicStroke(3.0f , BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL);
+    public static final float[] DASH = {8.0f};
+    public static final BasicStroke STROKE_DASH = new BasicStroke(3.5f , BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, DASH, 0.0f);
 
     // TODO make different "looks"
     public static Color cBackground = Color.WHITE;
@@ -119,8 +121,8 @@ public class Defines {
     public static Color cOccupied = Color.RED;
     public static Color cInRoute = Color.YELLOW;
 
-    public static final Font addressFont = new Font("Dialog", Font.BOLD, 6);
-    public static final Color addressColor = Color.MAGENTA;
+    public static final Font ADDRESS_FONT = new Font("Dialog", Font.BOLD, 6);
+    public static final Color ADDRESS_COLOR = Color.MAGENTA;
     
-    public static final String version = "1.1 - 16 May 2016";
+    public static final String VERSION = "1.1 - 16 May 2016";
 }

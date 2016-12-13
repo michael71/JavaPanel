@@ -1,6 +1,5 @@
 package de.blankedv.javapanel;
 
-import de.blankedv.javapanel.ActivePanelElement;
 import static de.blankedv.javapanel.Defines.*;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -19,6 +18,10 @@ public class RouteButtonElement extends ActivePanelElement {
     boolean toggleBlink = false;
     private long timeSet;
     public static boolean clearRouteButtonActive = false;
+    
+    // dimensions for button circle
+    private final int RAD = 4;  // radius of route button
+    private final int WID = 2 * RAD;
 
     public RouteButtonElement(String type, int x, int y, String name, int adr) {
         super(type, x, y, name, adr);
@@ -178,12 +181,12 @@ public class RouteButtonElement extends ActivePanelElement {
             return;
         }
 
-        g.setColor(Color.WHITE);
-        g.fillOval(x - 5, y - 5, 10, 10);
+        g.setColor(Color.DARK_GRAY); //(Color.WHITE);
+        g.fillOval(x - (RAD+1), y - (RAD+1), (WID+2), (WID+2));
 
         if ((enableEdit) || (adr == INVALID_INT)) {
             g.setColor(Color.LIGHT_GRAY);
-            g.fillOval(x - 5, y - 5, 10, 10);
+            g.fillOval(x - RAD, y - RAD, WID, WID);
         } else if (state == STATE_PRESSED) {
             if ((System.currentTimeMillis() - blink) > 500) {
                 toggleBlink = !toggleBlink;
@@ -191,17 +194,17 @@ public class RouteButtonElement extends ActivePanelElement {
             }
             if (toggleBlink) {
                 g.setColor(Color.DARK_GRAY);
-                g.fillOval(x - 4, y - 4, 8, 8);
+                g.fillOval(x - (RAD-1), y - (RAD-1), (WID-2), (WID-2));
             } else {
                 g.setColor(Color.WHITE);
-                g.fillOval(x - 5, y - 5, 10, 10);
+                g.fillOval(x - (RAD), y - (RAD), (WID), (WID));
             }
         } else if (state == STATE_NOT_PRESSED) {
             g.setColor(Color.WHITE);
-            g.fillOval(x - 5, y - 5, 10, 10);
+            g.fillOval(x - RAD, y - RAD, WID, WID);
         } else if (state == STATE_UNKNOWN) {
             g.setColor(Color.WHITE);
-            g.fillOval(x - 5, y - 5, 10, 10);
+            g.fillOval(x - RAD, y - RAD, WID, WID);
         }
 
         if (drawAddresses2) {
