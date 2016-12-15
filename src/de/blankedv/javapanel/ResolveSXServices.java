@@ -6,7 +6,7 @@
 package de.blankedv.javapanel;
 
 import static de.blankedv.javapanel.Defines.DEBUG;
-import static de.blankedv.javapanel.Defines.autoConfig;
+
 import java.awt.Dialog;
 import java.io.IOException;
 import java.net.Inet4Address;
@@ -81,7 +81,7 @@ public class ResolveSXServices {
 
             long t0 = System.currentTimeMillis();
 
-            if (autoConfig) {
+            if (Utils.autoConfigEnabled()) {
                 // in case we use "autoConfig" we have to wait until we have 
                 // identified the server (max waiting time = 5secs)
                 while ((nServer < services.length)

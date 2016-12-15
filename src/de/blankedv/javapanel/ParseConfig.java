@@ -32,7 +32,6 @@ public class ParseConfig {
     static boolean reqRunningFlag = false;
     static final boolean DEBUG_PARSING = false;
     static private String pName = "?";  // name of the panel, read from tag "panel"v
-    
 
     /**
      *
@@ -73,7 +72,7 @@ public class ParseConfig {
             return error;
         }
     }
-    
+
     public static String readConfigFromURL(String url) {
         // TODO
         return "error";
@@ -153,58 +152,62 @@ public class ParseConfig {
 
         // check for intersection of track, if new, add a turnout with unknown
         // lanbahn address
-        for (int i = 0; i < pes.size(); i++) {
-            PanelElement p = pes.get(i);
+        // do this only when "recalc Turnouts" is checked in settings
+        
+        if (prefs.getBoolean("recalcTurnouts", false)) {
+            for (int i = 0; i < pes.size(); i++) {
+                PanelElement p = pes.get(i);
 
-            for (int j = i + 1; j < pes.size(); j++) {
-                PanelElement q = pes.get(j);
+                for (int j = i + 1; j < pes.size(); j++) {
+                    PanelElement q = pes.get(j);
 
-                PanelElement panelelement = LinearMath.trackIntersect(p, q);
+                    PanelElement panelelement = LinearMath.trackIntersect(p, q);
 
-                if (panelelement != null) {
-                    if (panelelement.type.equals("doubleslip")) {
-                        // do nothing in the meantime
-                        // TODO implement for doubleslip a similar method as
-                        // with turnout
-                        // TODO currently doubleslip are two turnouts, separated
-                        // by a single pixel
-                        if (DEBUG_PARSING) {
-                            System.out.println(TAG + "(i,j)=(" + i + "," + j
-                                    + ") new? doubleslip found at x="
-                                    + panelelement.x + " y=" + panelelement.y);
-                        }
+                    if (panelelement != null) {
+                        if (panelelement.type.equals("doubleslip")) {
+                            // do nothing in the meantime
+                            // TODO implement for doubleslip a similar method as
+                            // with turnout
+                            // TODO currently doubleslip are two turnouts, separated
+                            // by a single pixel
+                            if (DEBUG_PARSING) {
+                                System.out.println(TAG + "(i,j)=(" + i + "," + j
+                                        + ") new? doubleslip found at x="
+                                        + panelelement.x + " y=" + panelelement.y);
+                            }
 
-                    } else {
-                        // there is an intersection with a turnout => make new
-                        // turnout
-                        if (DEBUG_PARSING) {
-                            System.out.println(TAG + "(i,j)=(" + i + "," + j
-                                    + ") new? turnout found at x="
-                                    + panelelement.x + " y=" + panelelement.y
-                                    + " xc=" + panelelement.x2 + " yc="
-                                    + panelelement.y2 + " xt="
-                                    + panelelement.xt + " yt="
-                                    + panelelement.yt);
-                        }
+                        } else {
+                            // there is an intersection with a turnout => make new
+                            // turnout
+                            if (DEBUG_PARSING) {
+                                System.out.println(TAG + "(i,j)=(" + i + "," + j
+                                        + ") new? turnout found at x="
+                                        + panelelement.x + " y=" + panelelement.y
+                                        + " xc=" + panelelement.x2 + " yc="
+                                        + panelelement.y2 + " xt="
+                                        + panelelement.xt + " yt="
+                                        + panelelement.yt);
+                            }
 
-                        // check whether this turnout is already known
-                        boolean known = false;
-                        for (PanelElement e : pes) {
-                            if ((e.getType().equals("turnout"))
-                                    && (e.x == panelelement.x)
-                                    && (e.y == panelelement.y)) {
-                                // at same position => match
-                                known = true;
-                                break;
+                            // check whether this turnout is already known
+                            boolean known = false;
+                            for (PanelElement e : pes) {
+                                if ((e.getType().equals("turnout"))
+                                        && (e.x == panelelement.x)
+                                        && (e.y == panelelement.y)) {
+                                    // at same position => match
+                                    known = true;
+                                    break;
+                                }
+                            }
+                            if (!known) {
+                                configHasChanged = true;
+                                pes.add(new TurnoutElement(panelelement));
                             }
                         }
-                        if (!known) {
-                            configHasChanged = true;
-                            pes.add(new TurnoutElement(panelelement));
-                        }
                     }
-                }
 
+                }
             }
         }
 

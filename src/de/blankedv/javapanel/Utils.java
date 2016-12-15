@@ -95,4 +95,13 @@ public class Utils {
 
         return s;
     }
+    
+    static boolean autoConfigEnabled() {
+        String ac = prefs.get("autoconfig","Ja");
+        if ( ac.equalsIgnoreCase("ja") || ac.equalsIgnoreCase("yes")) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

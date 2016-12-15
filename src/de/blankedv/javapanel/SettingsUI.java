@@ -8,7 +8,6 @@ package de.blankedv.javapanel;
 import static de.blankedv.javapanel.Defines.*;
 import static de.blankedv.javapanel.JavaPanel.frame;
 import java.io.File;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -20,7 +19,6 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 public class SettingsUI extends javax.swing.JFrame {
 
     private String pName = "?";
-    private String [] autoConfigSelection = {"Ja", "Nein"};
 
     /**
      * Creates new form SettingsUI
@@ -29,8 +27,7 @@ public class SettingsUI extends javax.swing.JFrame {
         this.pName = pName;
 
         initComponents();
-        
-        cbAutoConfig.setModel(new DefaultComboBoxModel(autoConfigSelection));
+
         initValues();  // read initial values from prefs
 
     }
@@ -58,9 +55,10 @@ public class SettingsUI extends javax.swing.JFrame {
         cbRoutesEnabled = new javax.swing.JCheckBox();
         cbAutoClearTime = new javax.swing.JComboBox<>();
         jLabel2 = new javax.swing.JLabel();
-        cbAutoConfig = new javax.swing.JComboBox<>();
         comboStyle = new javax.swing.JComboBox<>();
         jLabel3 = new javax.swing.JLabel();
+        comboAutoConfig = new javax.swing.JComboBox<>();
+        cbRecalcTurnouts = new javax.swing.JCheckBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Settings");
@@ -128,15 +126,18 @@ public class SettingsUI extends javax.swing.JFrame {
 
         jLabel2.setText("Fahrstr. löschen nach");
 
-        cbAutoConfig.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbAutoConfigActionPerformed(evt);
-            }
-        });
-
         comboStyle.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "DE", "UK", "US" }));
 
         jLabel3.setText("Gleisplan Stil:");
+
+        comboAutoConfig.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Ja", "Nein" }));
+
+        cbRecalcTurnouts.setText("Weichen berechnen");
+        cbRecalcTurnouts.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbRecalcTurnoutsActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -150,19 +151,24 @@ public class SettingsUI extends javax.swing.JFrame {
                             .addComponent(lblConfigFileName, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
                                 .addComponent(jLabel1)
-                                .addGap(32, 32, 32)
-                                .addComponent(cbAutoConfig, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(34, 34, 34)
+                                .addComponent(comboAutoConfig, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(85, 85, 85)
+                                .addComponent(cbSimulation)
                                 .addGap(0, 0, Short.MAX_VALUE)))
                         .addGap(25, 25, 25))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(cbSimulation)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(cbStartOfDay)
-                            .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(cbShowAddresses))
-                        .addGap(0, 143, Short.MAX_VALUE)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(cbStartOfDay)
+                                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(0, 143, Short.MAX_VALUE))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(cbShowAddresses)
+                                    .addComponent(cbRecalcTurnouts))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(cbRoutesEnabled)
                             .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
@@ -186,7 +192,8 @@ public class SettingsUI extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
-                    .addComponent(cbAutoConfig, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(comboAutoConfig, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cbSimulation))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblConfigFileName, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
@@ -200,42 +207,43 @@ public class SettingsUI extends javax.swing.JFrame {
                     .addComponent(cbRoutesEnabled))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(cbSimulation)
                     .addComponent(jLabel2)
-                    .addComponent(cbAutoClearTime, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(lblScale)
-                        .addComponent(comboScale, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(cbAutoClearTime, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(cbShowAddresses))
-                .addContainerGap(18, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblScale)
+                    .addComponent(comboScale, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cbRecalcTurnouts))
+                .addContainerGap(22, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(14, 14, 14))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 211, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(14, 14, 14))
+                        .addComponent(btnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 211, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap())))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnCancel)
                     .addComponent(btnSave))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         pack();
@@ -252,26 +260,23 @@ public class SettingsUI extends javax.swing.JFrame {
         prefs.putBoolean("startofday", cbStartOfDay.isSelected());
         prefs.putBoolean("simulation", cbSimulation.isSelected());
         prefs.putBoolean("routesEnabled", cbRoutesEnabled.isSelected());
+        prefs.putBoolean("cbRecalcTurnouts", cbRecalcTurnouts.isSelected());
         prefs.put("scale", comboScale.getSelectedItem().toString());
         prefs.put("configfilename", lblConfigFileName.getText());
         prefs.put("autocleartime", cbAutoClearTime.getSelectedItem().toString());
-        prefs.put("autoconfig", cbAutoConfig.getSelectedItem().toString());
+        prefs.put("autoconfig", comboAutoConfig.getSelectedItem().toString());
         prefs.put("style", comboStyle.getSelectedItem().toString());
         style = comboStyle.getSelectedItem().toString();
         Defines.setStyle(style);
-         
-        if (cbAutoConfig.getSelectedItem().toString().toLowerCase().contains("ja")) {
-            autoConfig = true;
-        } else {
-            autoConfig = false;
-        }
+
         if (DEBUG) {
             System.out.println("saving Settings");
             System.out.println("saving StartOfDay=" + cbStartOfDay.isSelected());
             System.out.println("saving Simulation=" + cbSimulation.isSelected());
             System.out.println("saving routesEnabled=" + cbRoutesEnabled.isSelected());
+            System.out.println("saving recalcTurnouts=" + cbRecalcTurnouts.isSelected());
             System.out.println("showAddresses=" + cbShowAddresses.isSelected());
-            System.out.println("autoconfig=" + cbAutoConfig.getSelectedItem().toString());
+            System.out.println("autoconfig=" + comboAutoConfig.getSelectedItem().toString());
             System.out.println("configfilename=" + lblConfigFileName.getText());
             System.out.println("scale=" + comboScale.getSelectedItem().toString());
         }
@@ -284,17 +289,6 @@ public class SettingsUI extends javax.swing.JFrame {
         JOptionPane.showMessageDialog(this, "Program needs Restart if settings have changed.");
         dispose();
     }//GEN-LAST:event_btnSaveActionPerformed
-
-    private void cbAutoConfigActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbAutoConfigActionPerformed
-        String acon = cbAutoConfig.getSelectedItem().toString();
-        if (acon.toLowerCase().contains("ja")) {
-            lblConfigFileName.setEnabled(false);
-            jButton1.setEnabled(false);
-        } else {
-            lblConfigFileName.setEnabled(true);
-            jButton1.setEnabled(true);
-        }
-    }//GEN-LAST:event_cbAutoConfigActionPerformed
 
     private void cbAutoClearTimeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbAutoClearTimeActionPerformed
         String ac = cbAutoClearTime.getSelectedItem().toString();
@@ -325,6 +319,10 @@ public class SettingsUI extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_cbShowAddressesActionPerformed
 
+    private void cbRecalcTurnoutsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbRecalcTurnoutsActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cbRecalcTurnoutsActionPerformed
+
     private void initValues() {
         if (DEBUG) {
             System.out.println("init values of settings");
@@ -337,23 +335,21 @@ public class SettingsUI extends javax.swing.JFrame {
         cbStartOfDay.setSelected(prefs.getBoolean("startOfDay", false));
         cbShowAddresses.setSelected(prefs.getBoolean("showAddresses", false));
         cbRoutesEnabled.setSelected(prefs.getBoolean("routesEnabled", false));
+        cbRecalcTurnouts.setSelected(prefs.getBoolean("recalcturnouts", false));
         String acon = prefs.get("autoconfig", "Ja");
-        if (acon.toLowerCase().contains("ja")) {
-            autoConfig = true;
-            cbAutoConfig.setSelectedItem(autoConfigSelection[0]);  // Ja
+        comboAutoConfig.setSelectedItem(acon);  // Ja
+        if (Utils.autoConfigEnabled()) {
             lblConfigFileName.setEnabled(false);
             jButton1.setEnabled(false);
         } else {
-            autoConfig = false;
-            cbAutoConfig.setSelectedItem(autoConfigSelection[1]);  // Nein 
             lblConfigFileName.setEnabled(true);
             jButton1.setEnabled(true);
         }
         String ac = prefs.get("autocleartime", "30s");
         cbAutoClearTime.setSelectedItem(ac);
         lblConfigFileName.setText(prefs.get("configfilename", LOCAL_DIRECTORY + "/" + CONFIG_FILENAME));
-        
-        style = prefs.get("style","DE");
+
+        style = prefs.get("style", "DE");
         Defines.setStyle(style);
         comboStyle.setSelectedItem(style);
     }
@@ -363,11 +359,12 @@ public class SettingsUI extends javax.swing.JFrame {
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnSave;
     private javax.swing.JComboBox<String> cbAutoClearTime;
-    private javax.swing.JComboBox<String> cbAutoConfig;
+    private javax.swing.JCheckBox cbRecalcTurnouts;
     private javax.swing.JCheckBox cbRoutesEnabled;
     private javax.swing.JCheckBox cbShowAddresses;
     private javax.swing.JCheckBox cbSimulation;
     private javax.swing.JCheckBox cbStartOfDay;
+    private javax.swing.JComboBox<String> comboAutoConfig;
     private javax.swing.JComboBox<String> comboScale;
     private javax.swing.JComboBox<String> comboStyle;
     private javax.swing.JButton jButton1;

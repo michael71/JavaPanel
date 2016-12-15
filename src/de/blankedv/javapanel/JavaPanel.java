@@ -36,6 +36,7 @@ import static de.blankedv.javapanel.LanbahnInterface.running;
 import static java.awt.Frame.MAXIMIZED_BOTH;
 
 import java.awt.Toolkit;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.UIManager;
@@ -53,10 +54,7 @@ public class JavaPanel extends JPanel implements ActionListener,
     static SettingsUI sett;
 
     static JMenuBar menuBar;
-    JMenu menu;
-    JMenuItem menuItem, menuExit;
-    JMenu menu2;
-    
+
     public static StatusBar statusBar = new StatusBar();
 
     public static HashMap<Integer, Integer> lbData = new HashMap<Integer, Integer>();
@@ -74,6 +72,9 @@ public class JavaPanel extends JPanel implements ActionListener,
     }
 
     private void initMenues() {
+        JMenu menu, menu2, menu3;
+        JMenuItem menuItem, menuItemStyle, menuExit;
+
         //Create the menu bar.
         menuBar = new JMenuBar();
 
@@ -88,6 +89,30 @@ public class JavaPanel extends JPanel implements ActionListener,
         menu.addSeparator();
         menuExit = new JMenuItem(quit);
         menu.add(menuExit);
+
+        menu3 = new JMenu("Ansicht");
+        menuBar.add(menu3);
+        menuItemStyle = new JMenuItem("Stil");
+        menu3.add(menuItemStyle);
+
+        final JCheckBoxMenuItem cbMenuItem = new JCheckBoxMenuItem("Kopfüber");
+        menu3.add(cbMenuItem);
+
+        cbMenuItem.addActionListener(new ActionListener() {
+            @Override
+
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("Item clicked: " + e.getActionCommand()+ " state="+cbMenuItem.getState());
+                // TODO flipUpsideDown ist im Moment ein Art "toggle"
+                flipUpsideDown = true; // cbMenuItem.getState();
+                PanelElement.scaleAll();
+            }
+
+            public void itemStateChanged(ItemEvent e) {
+                System.out.println("State changed: " + e.getStateChange());
+            }
+
+        });
 
         menu2 = new JMenu("Info");
         menuBar.add(menu2);
@@ -171,17 +196,17 @@ public class JavaPanel extends JPanel implements ActionListener,
         try {   // Set system look and feel
             UIManager.setLookAndFeel(
                     UIManager.getSystemLookAndFeelClassName());
-        } catch (UnsupportedLookAndFeelException | ClassNotFoundException 
+        } catch (UnsupportedLookAndFeelException | ClassNotFoundException
                 | InstantiationException | IllegalAccessException e) {
         }
 
         frame = new JFrame("Panel");
         JavaPanel javapanel = new JavaPanel();
-        
+
         frame.add(javapanel);
-         frame.setMinimumSize(new Dimension(400, 200));
-        frame.setJMenuBar(menuBar);      
-        frame.getContentPane().add(statusBar, java.awt.BorderLayout.SOUTH);      
+        frame.setMinimumSize(new Dimension(400, 200));
+        frame.setJMenuBar(menuBar);
+        frame.getContentPane().add(statusBar, java.awt.BorderLayout.SOUTH);
         fm.loadPosition();
         frame.pack();
 
@@ -190,9 +215,9 @@ public class JavaPanel extends JPanel implements ActionListener,
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        statusBar.setMessage("Verbinde mit SX Server...");       
-        String status = resolveServers();     
-        statusBar.setMessage(status);      
+        statusBar.setMessage("Verbinde mit SX Server...");
+        String status = resolveServers();
+        statusBar.setMessage(status);
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
@@ -230,7 +255,7 @@ public class JavaPanel extends JPanel implements ActionListener,
         }
 
         frame.setTitle(title);
- 
+
         lb = new LanbahnInterface();
         try {
             lb.init();
@@ -275,7 +300,7 @@ public class JavaPanel extends JPanel implements ActionListener,
         }
 
     }
-    
+
     private static void reloadConfig() {
         // TODO
     }
@@ -286,7 +311,9 @@ public class JavaPanel extends JPanel implements ActionListener,
 
         String fname = prefs.get("configfilename", LOCAL_DIRECTORY + "/" + CONFIG_FILENAME);
         panelName = ParseConfig.readConfigFromFile(fname);
-        WriteConfig.writeToXML(); // save with new, calculated elements
+        if (configHasChanged) {
+            WriteConfig.writeToXML(); // save with new, calculated elements
+        }
 
         if (panelName.toLowerCase().contains("error filenotfound")) {
             // Config file was not found
@@ -307,20 +334,20 @@ public class JavaPanel extends JPanel implements ActionListener,
     private static String resolveServers() {
         // search via jmDNS for the following services
         String[] services = {"_lanbahn._udp.local.", "_sxnet._tcp.local.", "_sxconfig._tcp.local."};
-        
+
         try {
-            servers = ResolveSXServices.init(services);  // wait for servers (max 10 secs)
+            servers = ResolveSXServices.init(services);  // wait for servers (max X secs)
         } catch (InterruptedException ex) {
             Logger.getLogger(JavaPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         String msg = "kein config server.";
-        for (SXServer s: servers) {
+        for (SXServer s : servers) {
             if (s.service.equalsIgnoreCase("sxconfig")) {
-                msg = "SX-Config Server: "+s.ip;
+                msg = "SX-Config Server: " + s.ip;
             }
-        }       
-        return msg;     
+        }
+        return msg;
     }
 
     private static void getPanelScale() {
@@ -364,7 +391,6 @@ public class JavaPanel extends JPanel implements ActionListener,
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-   
     private static float autoscalePanel() {
         int wi = frame.getWidth();
         int he = frame.getHeight();
@@ -376,9 +402,9 @@ public class JavaPanel extends JPanel implements ActionListener,
         if (DEBUG) {
             System.out.println("autoscalePanel, w=" + wi + " h=" + he);
         }
-        
+
         return Utils.calcPanelScale(wi, he);
- 
+
     }
 
     /**
@@ -404,15 +430,17 @@ public class JavaPanel extends JPanel implements ActionListener,
         public void componentShown(ComponentEvent arg0) {
         }
     }
-    
-     private static void loadPrefs() {
+
+    private static void loadPrefs() {
         simulation = prefs.getBoolean("simulation", false);
         sendStartOfDay = prefs.getBoolean("startOfDay", false);
         drawAddresses = prefs.getBoolean("showAddresses", false);
         drawAddresses2 = prefs.getBoolean("showAddresses", false);
         routesEnabled = prefs.getBoolean("routesEnabled", false);
+        boolean recalcTurnouts = prefs.getBoolean("recalcTurnouts", false);
         String ac = prefs.get("autocleartime", "30s");
         autoClearTimeRoutes = Integer.parseInt(ac.substring(0, ac.length() - 1));
+        String acon = prefs.get("autoconfig", "?");
 
         String scaleString = prefs.get("scale", "2.0");
         if (scaleString.toLowerCase().contains("auto")) {
@@ -424,16 +452,18 @@ public class JavaPanel extends JPanel implements ActionListener,
         } else {
             scale = Float.parseFloat(scaleString); // get scale from setting
         }
-        
-        style = prefs.get("style","DE");
+
+        style = prefs.get("style", "DE");
         Defines.setStyle(style);
-        
+
         if (DEBUG) {
             System.out.println("loading preferences");
             System.out.println("simulation=" + simulation);
             System.out.println("sendStartOfDay=" + sendStartOfDay);
             System.out.println("showAddresses=" + drawAddresses);
             System.out.println("scale=" + scaleString);
+            System.out.println("autoconfig=" + acon);
+            System.out.println("recalcTurnouts=" + recalcTurnouts);
         }
 
     }

@@ -222,7 +222,7 @@ public class PanelElement {
                     + " ymax=" + ymax);
         }
 
-        configHasChanged = true;
+        //configHasChanged = true;   ==> will not saved in xml file
 
     }
 

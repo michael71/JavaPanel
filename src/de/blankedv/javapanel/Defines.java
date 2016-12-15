@@ -89,7 +89,7 @@ public class Defines {
     // slash
 
     public static final String CONFIG_FILENAME = "demo-panel.xml";
-    public static boolean autoConfig = false;
+    
 
     public static final String DEMO_FILE = "demo-panel.xml"; // demo data in raw
     // assets dir.
@@ -132,6 +132,7 @@ public class Defines {
     public static void setStyle(String style) {
         switch (style) {
             case "DE":
+            default:
                 // TODO make different "looks"
                 cBackground = new Color(0.85f, 0.9f, 0.85f); //Color.LIGHT_GRAY;
                 
@@ -149,7 +150,7 @@ public class Defines {
                 cTurnoutShowClosed = Color.GREEN;
                 cTurnoutShowThrown = Color.RED;
 
-                addressFont = new Font("Dialog", Font.BOLD, 6);
+                addressFont = new Font("Ubuntu", Font.BOLD, 6);
                 addressColor = Color.MAGENTA;
                 break;
 
@@ -173,6 +174,28 @@ public class Defines {
                 
                 addressFont = new Font("Ubuntu", Font.BOLD, 6);
                 addressColor = Color.MAGENTA;
+                
+            case "UK":
+                // TODO make different "looks"
+                cBackground = new Color(0.2f, 0.5f, 0.25f); //Color.LIGHT_GRAY;
+                
+                cUnknown = Color.LIGHT_GRAY;
+                cTrack = Color.BLACK;
+                cSignal = Color.BLACK;
+                
+                cFree = Color.LIGHT_GRAY;
+                cOccupied = Color.RED;
+                cInRoute = Color.YELLOW;
+
+                cTurnoutInactive = Color.LIGHT_GRAY;
+                cTurnoutUnknown = Color.LIGHT_GRAY;
+                cTurnoutActive = Color.BLACK;
+                cTurnoutShowClosed = Color.GREEN;
+                cTurnoutShowThrown = Color.RED;
+
+                addressFont = new Font("Ubuntu", Font.BOLD, 6);
+                addressColor = Color.MAGENTA;
+                break;
 
         }
     }
