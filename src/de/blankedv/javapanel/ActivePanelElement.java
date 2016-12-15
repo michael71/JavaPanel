@@ -170,17 +170,9 @@ public abstract class ActivePanelElement extends PanelElement {
         }
     }
     
-  /*  public Rectangle prescaleRect(Rectangle r) {
-		r.x = (int)(r.x * scale);
-		r.y = (int)(r.y * scale);
-		r.width = (int)(r.width * scale);
-		r.height = (int)(r.height * scale);
-		return r;
-	}  */
-    
     protected void doDrawAddresses(Graphics2D g) {
-        g.setFont(ADDRESS_FONT);
-        g.setColor(ADDRESS_COLOR);
+        g.setFont(addressFont);
+        g.setColor(addressColor);
         //Rectangle bounds = getRect();
         String txt;
         if (adr == INVALID_INT) {
@@ -188,16 +180,6 @@ public abstract class ActivePanelElement extends PanelElement {
         } else {
             txt = "" + adr;
         }
-        /*addressPaint.getTextBounds(txt, 0, txt.length(), bounds);
-		int text_height = bounds.height();
-		int text_width = bounds.width();
-
-		Rect pre = prescaleRect(getRect());
-		canvas.drawRect(pre, addressBGPaint); // dark rectangle
-		canvas.drawText(txt, pre.left + text_width / 8, pre.top + 3
-				* text_height / 2, addressPaint); // the
-		// numbers
-         */
       
         if (x2 >= x) {
         //g.drawString(txt, (x+2)*scale, (y-2)*scale);

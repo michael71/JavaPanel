@@ -31,7 +31,8 @@ public class ParseConfig {
 
     static boolean reqRunningFlag = false;
     static final boolean DEBUG_PARSING = false;
-    static private String pName = "?";  // name of the panel, read from tag "panel"
+    static private String pName = "?";  // name of the panel, read from tag "panel"v
+    
 
     /**
      *
@@ -71,6 +72,11 @@ public class ParseConfig {
         } else {
             return error;
         }
+    }
+    
+    public static String readConfigFromURL(String url) {
+        // TODO
+        return "error";
     }
 
     private static String readXMLConfigFile(InputStream fis) {

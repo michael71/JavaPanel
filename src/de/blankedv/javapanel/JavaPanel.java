@@ -35,6 +35,12 @@ import static de.blankedv.javapanel.Defines.*;
 import static de.blankedv.javapanel.LanbahnInterface.running;
 import static java.awt.Frame.MAXIMIZED_BOTH;
 
+import java.awt.Toolkit;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+
 @SuppressWarnings("serial")
 public class JavaPanel extends JPanel implements ActionListener,
         ItemListener {
@@ -50,6 +56,8 @@ public class JavaPanel extends JPanel implements ActionListener,
     JMenu menu;
     JMenuItem menuItem, menuExit;
     JMenu menu2;
+    
+    public static StatusBar statusBar = new StatusBar();
 
     public static HashMap<Integer, Integer> lbData = new HashMap<Integer, Integer>();
 
@@ -62,11 +70,11 @@ public class JavaPanel extends JPanel implements ActionListener,
         loadPrefs();
 
         initMenues();
- 
+
     }
 
     private void initMenues() {
-               //Create the menu bar.
+        //Create the menu bar.
         menuBar = new JMenuBar();
 
         //Build the first menu.
@@ -83,8 +91,6 @@ public class JavaPanel extends JPanel implements ActionListener,
 
         menu2 = new JMenu("Info");
         menuBar.add(menu2);
-
-       
 
         /* not needed, no keyboard input
                addKeyListener(new KeyListener() {
@@ -124,14 +130,16 @@ public class JavaPanel extends JPanel implements ActionListener,
             }
         });
     }
-    
+
     @Override
     public void paint(Graphics g) {
         super.paint(g);
         Graphics2D g2d = (Graphics2D) g;
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
+
         g2d.setBackground(cBackground);
+        g2d.clearRect(0, 0, frame.getWidth(), frame.getHeight());
         g2d.scale(scale, scale);
         //g2d.translate(10, 10); TODO center the panel
         for (PanelElement e : panelElements) {
@@ -140,8 +148,6 @@ public class JavaPanel extends JPanel implements ActionListener,
     }
 
     public static void error(String errorTitle, String errorMessage) {
-        // JOptionPane.showMessageDialog(this, "Game Over", "Game Over", JOptionPane.YES_NO_OPTION|JOptionPane.CANCEL_OPTION);
-
         //Custom button text
         int n;
         //System.exit(ABORT);
@@ -152,25 +158,41 @@ public class JavaPanel extends JPanel implements ActionListener,
         if (n == JOptionPane.NO_OPTION) {
             System.exit(ABORT);
         }
-
         settings();
-
     }
 
     public static void settings() {
-        // JOptionPane.showMessageDialog(this, "not yet implemented", "Settings",  JOptionPane.OK_OPTION);
         sett = new SettingsUI(panelName);
         sett.setVisible(true);
     }
 
     public static void main(String[] args) throws InterruptedException {
 
-        frame = new JFrame("Panel");
+        try {   // Set system look and feel
+            UIManager.setLookAndFeel(
+                    UIManager.getSystemLookAndFeelClassName());
+        } catch (UnsupportedLookAndFeelException | ClassNotFoundException 
+                | InstantiationException | IllegalAccessException e) {
+        }
 
-        JavaPanel railwaypanel = new JavaPanel();
-        frame.add(railwaypanel);
+        frame = new JFrame("Panel");
+        JavaPanel javapanel = new JavaPanel();
+        
+        frame.add(javapanel);
+         frame.setMinimumSize(new Dimension(400, 200));
+        frame.setJMenuBar(menuBar);      
+        frame.getContentPane().add(statusBar, java.awt.BorderLayout.SOUTH);      
+        fm.loadPosition();
+        frame.pack();
+
+        frame.setVisible(true);
+        frame.addComponentListener(new FrameListener());
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        statusBar.setMessage("Verbinde mit SX Server...");       
+        String status = resolveServers();     
+        statusBar.setMessage(status);      
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
@@ -186,23 +208,7 @@ public class JavaPanel extends JPanel implements ActionListener,
             }
         });
 
-        String workingdirectory = System.getProperty("user.dir");
-        System.out.println("dir=" + workingdirectory);
-
-        String fname = prefs.get("configfilename", LOCAL_DIRECTORY + "/" + CONFIG_FILENAME);
-        panelName = ParseConfig.readConfigFromFile(fname);
-        WriteConfig.writeToXML(); // save with new, calculated elements
-        
-        if (panelName.toLowerCase().contains("error filenotfound")) {
-            // Config file was not found
-            frame.setPreferredSize(new Dimension(500, 300));
-            error(panelName, fname);
-            while (sett.isVisible()) {  // exit program when settings window is closed
-                Thread.sleep(200);
-            }
-            System.exit(0);
-
-        }
+        readAndParseConfigFromFile();
 
         String title = "Panel Name: " + panelName;
         sendStartOfDay = prefs.getBoolean("startofday", false);
@@ -223,15 +229,8 @@ public class JavaPanel extends JPanel implements ActionListener,
             }
         }
 
-        frame.setMinimumSize(new Dimension(400, 200));
         frame.setTitle(title);
-        frame.setJMenuBar(menuBar);
-        fm.loadPosition();
-        frame.pack();
-
-        frame.setVisible(true);
-        frame.addComponentListener(new FrameListener());
-
+ 
         lb = new LanbahnInterface();
         try {
             lb.init();
@@ -239,7 +238,7 @@ public class JavaPanel extends JPanel implements ActionListener,
             System.out.println(TAG + " ERROR: could not init LanbahnInterface " + ex.getMessage());
         }
 
-        railwaypanel.addMouseListener(new MouseAdapter() {
+        javapanel.addMouseListener(new MouseAdapter() {
 
             @Override
             public void mousePressed(MouseEvent e) {
@@ -260,28 +259,78 @@ public class JavaPanel extends JPanel implements ActionListener,
             }
 
         });
-         
+
+        // repaint loop
         while (true) {
             if (recalcScaleFlag) {
                 getPanelScale();
                 recalcScaleFlag = false;
             }
-            railwaypanel.repaint();
+            if (reloadConfigFlag) {
+                reloadConfig();
+            }
+            javapanel.repaint();
             Route.auto();  // clear routes after some seconds
             Thread.sleep(200);  // allow some time for other processes/programs
         }
+
+    }
+    
+    private static void reloadConfig() {
+        // TODO
+    }
+
+    private static void readAndParseConfigFromFile() {
+        String workingdirectory = System.getProperty("user.dir");
+        System.out.println("dir=" + workingdirectory);
+
+        String fname = prefs.get("configfilename", LOCAL_DIRECTORY + "/" + CONFIG_FILENAME);
+        panelName = ParseConfig.readConfigFromFile(fname);
+        WriteConfig.writeToXML(); // save with new, calculated elements
+
+        if (panelName.toLowerCase().contains("error filenotfound")) {
+            // Config file was not found
+            frame.setPreferredSize(new Dimension(500, 300));
+            error(panelName, fname);
+            while (sett.isVisible()) {
+                try {
+                    // exit program when settings window is closed
+                    Thread.sleep(200);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(JavaPanel.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            System.exit(0);
+        }
+    }
+
+    private static String resolveServers() {
+        // search via jmDNS for the following services
+        String[] services = {"_lanbahn._udp.local.", "_sxnet._tcp.local.", "_sxconfig._tcp.local."};
         
-       
+        try {
+            servers = ResolveSXServices.init(services);  // wait for servers (max 10 secs)
+        } catch (InterruptedException ex) {
+            Logger.getLogger(JavaPanel.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        String msg = "kein config server.";
+        for (SXServer s: servers) {
+            if (s.service.equalsIgnoreCase("sxconfig")) {
+                msg = "SX-Config Server: "+s.ip;
+            }
+        }       
+        return msg;     
     }
 
     private static void getPanelScale() {
         String s = prefs.get("scale", "auto");
-        if (s.equalsIgnoreCase("auto")) {
+        if (s.toLowerCase().contains("auto")) {
             scale = autoscalePanel();
             if (scale < 1.0f) {
                 scale = 1.0f;
             }
-        } else if (s.equalsIgnoreCase("maximize")) {
+        } else if (s.toLowerCase().contains("max")) {
             frame.setExtendedState(MAXIMIZED_BOTH);
             scale = autoscalePanel();
             if (scale < 1.0f) {
@@ -315,35 +364,7 @@ public class JavaPanel extends JPanel implements ActionListener,
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    private static void loadPrefs() {
-        simulation = prefs.getBoolean("simulation", false);
-        sendStartOfDay = prefs.getBoolean("startOfDay", false);
-        drawAddresses = prefs.getBoolean("showAddresses", false);
-        drawAddresses2 = prefs.getBoolean("showAddresses", false);
-        routesEnabled = prefs.getBoolean("routesEnabled", false);
-        String ac = prefs.get("autocleartime","30s");
-        autoClearTimeRoutes = Integer.parseInt(ac.substring(0,ac.length()-1));
-        
-        String scaleString = prefs.get("scale", "2.0");
-        if (scaleString.equalsIgnoreCase("auto")) {
-            scale = 2.0f;
-            recalcScaleFlag = true; // calculate actual scale later
-        } else if (scaleString.equalsIgnoreCase("maximize")) {
-            scale = 2.0f;
-            recalcScaleFlag = true; // calculate actual scale later
-        } else {
-            scale = Float.parseFloat(scaleString); // get scale from setting
-        }
-        if (DEBUG) {
-            System.out.println("loading preferences");
-            System.out.println("simulation=" + simulation);
-            System.out.println("sendStartOfDay=" + sendStartOfDay);
-            System.out.println("showAddresses=" + drawAddresses);
-            System.out.println("scale=" + scaleString);
-        }
-
-    }
-
+   
     private static float autoscalePanel() {
         int wi = frame.getWidth();
         int he = frame.getHeight();
@@ -355,48 +376,9 @@ public class JavaPanel extends JPanel implements ActionListener,
         if (DEBUG) {
             System.out.println("autoscalePanel, w=" + wi + " h=" + he);
         }
-        int minx = 1000;  
-        int maxx = 0;
-        int miny = 1000;   
-        int maxy = 0;
-
-        for (PanelElement pe : panelElements) {
-            int peMaxx = Utils.max(pe.x, pe.xt, pe.x2);
-            int peMaxy = Utils.max(pe.y, pe.yt, pe.y2);
-            
-            int peMinx = Utils.min(pe.x, pe.xt, pe.x2);
-            int peMiny = Utils.min(pe.y, pe.yt, pe.y2);
-
-            if (peMaxx > maxx) {
-                maxx = peMaxx;
-            }
-            if (peMaxy > maxy) {
-                maxy = peMaxy;
-            }
-            
-            if (peMinx < minx) {
-                minx = peMinx;
-            }
-            if (peMiny < miny) {
-                miny = peMiny;
-            }
-        }
-        if (DEBUG) {
-            System.out.println("minx=" + minx + " maxx=" + maxx + 
-                    " miny=" + miny + " maxy=" + maxy);
-        }
-        float px = (float) wi / (float) (maxx - minx + 40);
-        float py = (float) he / (float) (maxy - miny + 40);
-        if (DEBUG) {
-            System.out.println("px=" + px + " py=" + py);
-        }
-
-        float s = Math.min(px, py);
-
-        prefs.putFloat("auto-scale", s);
-        prefs.put("scale", "auto");
-
-        return s;
+        
+        return Utils.calcPanelScale(wi, he);
+ 
     }
 
     /**
@@ -422,4 +404,38 @@ public class JavaPanel extends JPanel implements ActionListener,
         public void componentShown(ComponentEvent arg0) {
         }
     }
+    
+     private static void loadPrefs() {
+        simulation = prefs.getBoolean("simulation", false);
+        sendStartOfDay = prefs.getBoolean("startOfDay", false);
+        drawAddresses = prefs.getBoolean("showAddresses", false);
+        drawAddresses2 = prefs.getBoolean("showAddresses", false);
+        routesEnabled = prefs.getBoolean("routesEnabled", false);
+        String ac = prefs.get("autocleartime", "30s");
+        autoClearTimeRoutes = Integer.parseInt(ac.substring(0, ac.length() - 1));
+
+        String scaleString = prefs.get("scale", "2.0");
+        if (scaleString.toLowerCase().contains("auto")) {
+            scale = 2.0f;
+            recalcScaleFlag = true; // calculate actual scale later
+        } else if (scaleString.toLowerCase().contains("max")) {
+            scale = 2.0f;
+            recalcScaleFlag = true; // calculate actual scale later
+        } else {
+            scale = Float.parseFloat(scaleString); // get scale from setting
+        }
+        
+        style = prefs.get("style","DE");
+        Defines.setStyle(style);
+        
+        if (DEBUG) {
+            System.out.println("loading preferences");
+            System.out.println("simulation=" + simulation);
+            System.out.println("sendStartOfDay=" + sendStartOfDay);
+            System.out.println("showAddresses=" + drawAddresses);
+            System.out.println("scale=" + scaleString);
+        }
+
+    }
+
 }

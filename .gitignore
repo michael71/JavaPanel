@@ -18,3 +18,4 @@ nb-configuration.xml
 
 # temp files
 *~
+/dist/
