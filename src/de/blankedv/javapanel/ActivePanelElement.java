@@ -5,12 +5,7 @@
  */
 package de.blankedv.javapanel;
 
-import de.blankedv.javapanel.PanelElement;
-import de.blankedv.javapanel.SensorElement;
-import de.blankedv.javapanel.SignalElement;
-import de.blankedv.javapanel.Utils;
 import static de.blankedv.javapanel.Defines.*;
-import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 
@@ -54,8 +49,7 @@ public abstract class ActivePanelElement extends PanelElement {
 
     protected static final int STATE_UNKNOWN = INVALID_INT;
 
-    protected int state;
-    protected int adr = INVALID_INT;
+
     protected long lastToggle = 0L;
     protected long lastUpdateTime = 0L;
 
@@ -85,6 +79,11 @@ public abstract class ActivePanelElement extends PanelElement {
     public int getAdr() {
         return adr;
     }
+    
+    @Override
+    public int getAdr2() {
+        return adr2;
+    }
 
     @Override
     public int getState() {
@@ -113,6 +112,10 @@ public abstract class ActivePanelElement extends PanelElement {
         if (adr != INVALID_INT) {
             //TODO sendQ.add("READ " + adr); // request update for this element
         }
+    }
+    
+    public void setAdr2(int adr) {
+        this.adr2 = adr;
     }
 
     

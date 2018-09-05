@@ -121,7 +121,11 @@ public class WriteConfig {
                     writeAttribute("xt", pe.xt);
                     writeAttribute("yt", pe.yt);
                 }
-                if (pe.getAdr() != INVALID_INT) {
+
+                if ((pe.getAdr() != INVALID_INT) && (pe.getAdr2() != INVALID_INT)) {
+                    String s = pe.getAdr() + "," + pe.getAdr2();
+                    writeAttribute("adr", s);
+                } else if (pe.getAdr() != INVALID_INT) {
                     writeAttribute("adr", pe.getAdr());
                 }
                 writeClose();

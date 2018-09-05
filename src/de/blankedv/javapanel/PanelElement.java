@@ -21,6 +21,9 @@ public class PanelElement {
     protected int y2 = INVALID_INT;
     protected int xt = INVALID_INT; // "thrown" position for turnout
     protected int yt = INVALID_INT;
+    protected int state = 0;
+    protected int adr = INVALID_INT;
+    protected int adr2 = INVALID_INT;  // needed for DCC sensors with 2 addresses (1=occ/free, 2=in-route)
     protected String route = "";
 
     public PanelElement(String type, int x, int y) {
@@ -76,8 +79,16 @@ public class PanelElement {
     public int getAdr() {
         return INVALID_INT;
     }
+    
+    public int getAdr2() {
+        return INVALID_INT;
+    }
 
     public void setAdr(int a) {
+
+    }
+    
+    public void setAdr2(int a) {
 
     }
 

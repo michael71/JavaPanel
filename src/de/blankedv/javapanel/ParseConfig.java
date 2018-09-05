@@ -153,7 +153,6 @@ public class ParseConfig {
         // check for intersection of track, if new, add a turnout with unknown
         // lanbahn address
         // do this only when "recalc Turnouts" is checked in settings
-        
         if (prefs.getBoolean("recalcTurnouts", false)) {
             for (int i = 0; i < pes.size(); i++) {
                 PanelElement p = pes.get(i);
@@ -211,22 +210,24 @@ public class ParseConfig {
             }
         }
 
-        items = root.getElementsByTagName("routebutton");
-        if (DEBUG) {
-            System.out.println(TAG + "config: " + items.getLength() + " routebuttons");
-        }
-        for (int i = 0; i < items.getLength(); i++) {
-            pes.add(parseRouteButton(items.item(i)));
-        }
 
         // look for sensors
-        // SENSORS als LETZTE !!!! important (sind damit immer "on top")
+        // SENSORS als VORLETZTE !!!! important (sind damit immer "on top")
         items = root.getElementsByTagName("sensor");
         if (DEBUG) {
             System.out.println(TAG + "config: " + items.getLength() + " sensors");
         }
         for (int i = 0; i < items.getLength(); i++) {
             pes.add(parseSensor(items.item(i)));
+        }
+        
+        // routebutton als ALLERLETZTE
+        items = root.getElementsByTagName("routebutton");
+        if (DEBUG) {
+            System.out.println(TAG + "config: " + items.getLength() + " routebuttons");
+        }
+        for (int i = 0; i < items.getLength(); i++) {
+            pes.add(parseRouteButton(items.item(i)));
         }
 
         return pes;
@@ -244,17 +245,17 @@ public class ParseConfig {
             if (theAttribute.getNodeName().equals("name")) {
                 pe.name = theAttribute.getNodeValue();
             } else if (theAttribute.getNodeName().equals("x")) {
-                pe.x = getPositionNode(theAttribute);
+                pe.x = getIntNodeValue(theAttribute);
             } else if (theAttribute.getNodeName().equals("y")) {
-                pe.y = getPositionNode(theAttribute);
+                pe.y = getIntNodeValue(theAttribute);
             } else if (theAttribute.getNodeName().equals("x2")) {
-                pe.x2 = getPositionNode(theAttribute);
+                pe.x2 = getIntNodeValue(theAttribute);
             } else if (theAttribute.getNodeName().equals("y2")) {
-                pe.y2 = getPositionNode(theAttribute);
+                pe.y2 = getIntNodeValue(theAttribute);
             } else if (theAttribute.getNodeName().equals("xt")) {
-                pe.xt = getPositionNode(theAttribute);
+                pe.xt = getIntNodeValue(theAttribute);
             } else if (theAttribute.getNodeName().equals("yt")) {
-                pe.yt = getPositionNode(theAttribute);
+                pe.yt = getIntNodeValue(theAttribute);
             } else if (theAttribute.getNodeName().equals("adr")) {
                 pe.setAdr(Integer.parseInt(theAttribute.getNodeValue()));
             } else if (DEBUG_PARSING) {
@@ -268,7 +269,7 @@ public class ParseConfig {
 
     }
 
-    private static int getPositionNode(Node a) {
+    private static int getIntNodeValue(Node a) {
         return Integer.parseInt(a.getNodeValue());
     }
 
@@ -284,13 +285,13 @@ public class ParseConfig {
             if (theAttribute.getNodeName().equals("name")) {
                 pe.name = theAttribute.getNodeValue();
             } else if (theAttribute.getNodeName().equals("x")) {
-                pe.x = getPositionNode(theAttribute);
+                pe.x = getIntNodeValue(theAttribute);
             } else if (theAttribute.getNodeName().equals("y")) {
-                pe.y = getPositionNode(theAttribute);
+                pe.y = getIntNodeValue(theAttribute);
             } else if (theAttribute.getNodeName().equals("x2")) {
-                pe.x2 = getPositionNode(theAttribute);
+                pe.x2 = getIntNodeValue(theAttribute);
             } else if (theAttribute.getNodeName().equals("y2")) {
-                pe.y2 = getPositionNode(theAttribute);
+                pe.y2 = getIntNodeValue(theAttribute);
             } else if (theAttribute.getNodeName().equals("adr")) {
                 pe.setAdr(Integer.parseInt(theAttribute.getNodeValue()));
             } else if (DEBUG_PARSING) {
@@ -316,9 +317,9 @@ public class ParseConfig {
             if (theAttribute.getNodeName().equals("name")) {
                 pe.name = theAttribute.getNodeValue();
             } else if (theAttribute.getNodeName().equals("x")) {
-                pe.x = getPositionNode(theAttribute);
+                pe.x = getIntNodeValue(theAttribute);
             } else if (theAttribute.getNodeName().equals("y")) {
-                pe.y = getPositionNode(theAttribute);
+                pe.y = getIntNodeValue(theAttribute);
             } else if (theAttribute.getNodeName().equals("route")) {
                 pe.route = theAttribute.getNodeValue();
             } else if (theAttribute.getNodeName().equals("adr")) {
@@ -368,17 +369,27 @@ public class ParseConfig {
             if (theAttribute.getNodeName().equals("name")) {
                 pe.name = theAttribute.getNodeValue();
             } else if (theAttribute.getNodeName().equals("x")) {
-                pe.x = getPositionNode(theAttribute);
+                pe.x = getIntNodeValue(theAttribute);
             } else if (theAttribute.getNodeName().equals("y")) {
-                pe.y = getPositionNode(theAttribute);
+                pe.y = getIntNodeValue(theAttribute);
             } else if (theAttribute.getNodeName().equals("x2")) {
-                pe.x2 = getPositionNode(theAttribute);
+                pe.x2 = getIntNodeValue(theAttribute);
             } else if (theAttribute.getNodeName().equals("y2")) {
-                pe.y2 = getPositionNode(theAttribute);
+                pe.y2 = getIntNodeValue(theAttribute);
             } else if (theAttribute.getNodeName().equals("icon")) {
                 pe.setType(theAttribute.getNodeValue());
             } else if (theAttribute.getNodeName().equals("adr")) {
-                pe.setAdr(Integer.parseInt(theAttribute.getNodeValue()));
+                String s = theAttribute.getNodeValue();
+                s = s.replace(".", "");
+                //s = s.replace("\\s+", "");
+                String[] sArr = s.split(",");
+                if (sArr.length >= 1) {
+                    pe.setAdr(Integer.parseInt(sArr[0]));
+                }
+                if (sArr.length >= 2) {
+                    pe.setAdr2(Integer.parseInt(sArr[1]));
+                }
+
             } else if (DEBUG_PARSING) {
                 System.out.println(TAG
                         + "unknown attribute " + theAttribute.getNodeName()
@@ -405,13 +416,13 @@ public class ParseConfig {
             // if (DEBUG_PARSING) System.out.println(TAG+theAttribute.getNodeName() + "=" +
             // theAttribute.getNodeValue());
             if (theAttribute.getNodeName().equals("x")) {
-                pe.x = getPositionNode(theAttribute);
+                pe.x = getIntNodeValue(theAttribute);
             } else if (theAttribute.getNodeName().equals("y")) {
-                pe.y = getPositionNode(theAttribute);
+                pe.y = getIntNodeValue(theAttribute);
             } else if (theAttribute.getNodeName().equals("x2")) {
-                pe.x2 = getPositionNode(theAttribute);
+                pe.x2 = getIntNodeValue(theAttribute);
             } else if (theAttribute.getNodeName().equals("y2")) {
-                pe.y2 = getPositionNode(theAttribute);
+                pe.y2 = getIntNodeValue(theAttribute);
             } else if (DEBUG_PARSING) {
                 System.out.println(TAG
                         + "unknown attribute " + theAttribute.getNodeName()
